@@ -144,4 +144,13 @@ app.use((req, res) => {
   res.status(404).json({ error: "Route not found" });
 });
 
+const corsOptions = {
+  origin: [
+    "https://your-frontend-live-url.onrender.com", 
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true, // If cookies or authentication are used
+};
 
+
+app.use(cors(corsOptions));
