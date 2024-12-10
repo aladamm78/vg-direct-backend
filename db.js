@@ -2,13 +2,13 @@ const { Pool } = require("pg");
 require("dotenv").config();
 
 const pool = new Pool({
-  host: "aws-0-us-east-1.pooler.supabase.com",
-  port: 6543,
-  database: "postgres", // Change if your database name is different
-  user: "postgres.hgmddkatqfqxssgcliwn",
-  password: "WipeOut2048!", // Replace with your password
+  host: process.env.SUPABASE_HOST,
+  port: process.env.SUPABASE_PORT,
+  database: process.env.SUPABASE_DATABASE,
+  user: process.env.SUPABASE_USER,
+  password: process.env.SUPABASE_PASSWORD,
   ssl: {
-    rejectUnauthorized: false, // Supabase requires SSL
+    rejectUnauthorized: false,
   },
 });
 
