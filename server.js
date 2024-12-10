@@ -4,12 +4,11 @@ const bodyParser = require("body-parser");
 const axios = require("axios");
 const pool = require("./db"); 
 
-
 const forumRoutes = require("./routes/forum");
 const genresRoutes = require("./routes/genres");
 const profileRoutes = require("./routes/profile");
 const authRoutes = require("./routes/auth");
-const ratingsRoutes = require("./routes/ratings");
+const ratingsRoutes = require("./routes/ratings"); 
 const userRoutes = require('./routes/user');
 const commentsRoutes = require('./routes/comments');
 const reviewsRoutes = require('./routes/reviews');
@@ -30,11 +29,11 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // Routes
-app.use("/api/forum-posts", forumRoutes); 
-app.use("/api/genres", genresRoutes); 
-app.use("/api/profile", profileRoutes); 
-app.use("/api/auth", authRoutes); 
-app.use("/api/ratings", ratingsRoutes); 
+app.use("/api/forum-posts", forumRoutes);
+app.use("/api/genres", genresRoutes);
+app.use("/api/profile", profileRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/ratings", ratingsRoutes); // Use Ratings Router
 app.use('/api/users', userRoutes);
 app.use('/api', commentsRoutes);
 app.use('/api', reviewsRoutes);
@@ -66,7 +65,7 @@ app.get("/api/games/:id", async (req, res) => {
   try {
     console.log(`Fetching game details for rawg_id: ${id}`);
 
-    // Step 1: Check if the game already exists
+    // Check if the game already exists in the database
     const gameQuery = `
       SELECT * 
       FROM games 
@@ -79,13 +78,13 @@ app.get("/api/games/:id", async (req, res) => {
       return res.json(gameResult.rows[0]); // Return existing game
     }
 
-    // Step 2: Fetch game details from RAWG API if not found
+    // Fetch game details from RAWG API if not found
     const axiosConfig = {
       timeout: 10000,
       params: { key: API_KEY },
     };
 
-    const rawgResponse = await axios.get(`https://api.rawg.io/api/games/${id}`, axiosConfig);
+    const rawgResponse = await axios.get(`${BASE_URL}/games/${id}`, axiosConfig);
     const data = rawgResponse.data;
 
     const description = data.description_raw || data.description || "No description available";
@@ -112,7 +111,7 @@ app.get("/api/games/:id", async (req, res) => {
       developer: developers,
       image_url: data.background_image || "",
     };
-
+    console.log(`[DEBUG] Preparing to insert game into database:`, gameData);
     console.log(`Inserting new game into database. rawg_id: ${id}`);
     const insertGameQuery = `
       INSERT INTO games (game_id, rawg_id, title, description, platform, release_year, genre, developer, image_url)
@@ -138,7 +137,6 @@ app.get("/api/games/:id", async (req, res) => {
   }
 });
 
-
 // 404 handler for unknown routes
 app.use((req, res) => {
   res.status(404).json({ error: "Route not found" });
@@ -151,6 +149,5 @@ const corsOptions = {
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   credentials: true, // If cookies or authentication are used
 };
-
 
 app.use(cors(corsOptions));

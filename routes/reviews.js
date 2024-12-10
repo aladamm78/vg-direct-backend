@@ -1,3 +1,6 @@
+require('dotenv').config();
+
+
 const express = require("express");
 const db = require("../db"); // Database connection
 const authenticateJWT = require("../middleware/authenticateJWT"); // JWT authentication middleware

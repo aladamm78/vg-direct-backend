@@ -3,6 +3,8 @@ const db = require("../db"); // Import your database connection
 const authenticateJWT = require("../middleware/authenticateJWT"); // Import JWT authentication middleware
 const axios = require("axios");
 
+const baseURL = "https://vg-direct-backend-1.onrender.com";
+
 const router = express.Router();
 
 // Route: Add or Update a Rating (requires authentication)
@@ -31,7 +33,7 @@ router.post("/", authenticateJWT, async (req, res, next) => {
 
     // Fetch the game_id from the database
     console.log(`Fetching game_id for rawg_id: ${game_id}`);
-    const gameResponse = await axios.get(`http://localhost:5000/api/games/${game_id}`);
+    const gameResponse = await axios.get(`${baseURL}/api/games/${game_id}`);
     const dbGameId = gameResponse.data.game_id;
     console.log("Fetched game_id from database:", dbGameId);
 
@@ -65,8 +67,6 @@ router.post("/", authenticateJWT, async (req, res, next) => {
   }
 });
 
-
-
 // Route: Get Average Rating for a Game (no authentication required)
 router.get("/:game_id/average-rating", async (req, res, next) => {
   try {
@@ -74,7 +74,7 @@ router.get("/:game_id/average-rating", async (req, res, next) => {
     // console.log("Received game_id (rawg_id):", game_id);
 
     // Use the `/api/games/:id` route to fetch or add the game and get its `game_id`
-    const gameResponse = await axios.get(`http://localhost:5000/api/games/${game_id}`);
+    const gameResponse = await axios.get(`${baseURL}/api/games/${game_id}`);
     const actualGameId = gameResponse.data.game_id;
 
     // Fetch the average rating using the actual `game_id`
@@ -109,7 +109,7 @@ router.get("/:game_id/:user_id", async (req, res, next) => {
 
   try {
     // Use the `/api/games/:id` route to fetch or add the game and get its `game_id`
-    const gameResponse = await axios.get(`http://localhost:5000/api/games/${game_id}`);
+    const gameResponse = await axios.get(`${baseURL}/api/games/${game_id}`);
     const actualGameId = gameResponse.data.game_id;
 
     // Query the ratings table for the actual game_id
