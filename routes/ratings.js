@@ -34,6 +34,7 @@ router.post("/", authenticateJWT, async (req, res, next) => {
     // Fetch the game_id from the database
     console.log(`Fetching game_id for rawg_id: ${game_id}`);
     const gameResponse = await axios.get(`${baseURL}/api/games/${game_id}`);
+    console.log("Received game_id response from backend:", gameResponse.data);
     const dbGameId = gameResponse.data.game_id;
     console.log("Fetched game_id from database:", dbGameId);
 
@@ -69,15 +70,20 @@ router.post("/", authenticateJWT, async (req, res, next) => {
 
 // Route: Get Average Rating for a Game (no authentication required)
 router.get("/:game_id/average-rating", async (req, res, next) => {
+  console.log("GET /api/ratings/:game_id/average-rating called");
+
   try {
     const { game_id } = req.params; // `game_id` here is actually the `rawg_id`
-    // console.log("Received game_id (rawg_id):", game_id);
+    console.log("Received game_id (rawg_id):", game_id);
 
     // Use the `/api/games/:id` route to fetch or add the game and get its `game_id`
+    console.log(`Fetching game_id for rawg_id: ${game_id}`);
     const gameResponse = await axios.get(`${baseURL}/api/games/${game_id}`);
+    console.log("Received game_id response from backend:", gameResponse.data);
     const actualGameId = gameResponse.data.game_id;
 
     // Fetch the average rating using the actual `game_id`
+    console.log(`Querying average rating for game_id: ${actualGameId}`);
     const result = await db.query(
       `
       SELECT ROUND(AVG(score)::numeric, 2) AS average_rating
@@ -99,9 +105,12 @@ router.get("/:game_id/average-rating", async (req, res, next) => {
 
 // Route: Get a User's Rating for a Game
 router.get("/:game_id/:user_id", async (req, res, next) => {
+  console.log("GET /api/ratings/:game_id/:user_id called");
+
   const { game_id, user_id } = req.params;
 
   // Validate input parameters
+  console.log("Received params:", { game_id, user_id });
   if (!game_id || !user_id || isNaN(parseInt(user_id))) {
     console.error("Invalid game_id or user_id:", { game_id, user_id });
     return res.status(400).json({ error: "Invalid game_id or user_id" });
@@ -109,10 +118,13 @@ router.get("/:game_id/:user_id", async (req, res, next) => {
 
   try {
     // Use the `/api/games/:id` route to fetch or add the game and get its `game_id`
+    console.log(`Fetching game_id for rawg_id: ${game_id}`);
     const gameResponse = await axios.get(`${baseURL}/api/games/${game_id}`);
+    console.log("Received game_id response from backend:", gameResponse.data);
     const actualGameId = gameResponse.data.game_id;
 
     // Query the ratings table for the actual game_id
+    console.log(`Querying rating for game_id: ${actualGameId}, user_id: ${user_id}`);
     const result = await db.query(
       `
       SELECT score

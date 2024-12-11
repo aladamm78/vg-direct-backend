@@ -16,10 +16,14 @@ const searchRoutes = require("./routes/search");
 
 const app = express();
 
+module.exports = app;
+
+if (process.env.NODE_ENV !== "test") {
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+}
 
 const BASE_URL = "https://api.rawg.io/api";
 const API_KEY = "9aa05b2ff77b476c8ff49505059dd4ed";
