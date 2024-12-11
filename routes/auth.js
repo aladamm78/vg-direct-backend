@@ -65,20 +65,32 @@ router.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body;
 
-    // Example: Validate user credentials (use your database here)
-    const user = { user_id: 28, username: "testuser2" }; // Mocked user for testing
+    if (!username || !password) {
+      return res.status(400).json({ error: "Username and password are required" });
+    }
 
-    // Log the secret key being used to generate the token
-    console.log("SECRET_KEY for token generation:", SECRET_KEY);
+    // Query the database for the user by username
+    const result = await pool.query("SELECT * FROM users WHERE username = $1", [username]);
 
-    // Generate token
+    if (result.rows.length === 0) {
+      return res.status(400).json({ error: "Invalid username or password" });
+    }
+
+    const user = result.rows[0];
+
+    // Compare the provided password with the stored hashed password
+    const isPasswordValid = await bcrypt.compare(password, user.password_hash);
+
+    if (!isPasswordValid) {
+      return res.status(400).json({ error: "Invalid username or password" });
+    }
+
+    // Generate a JWT token if the username and password are valid
     const token = jwt.sign(
       { user_id: user.user_id, username: user.username },
       SECRET_KEY,
       { expiresIn: '1h' }
     );
-
-    console.log("Generated token:", token); // Log the generated token
 
     res.json({ token });
   } catch (err) {
@@ -86,6 +98,7 @@ router.post('/login', async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
   
 
 module.exports = router;
