@@ -17,7 +17,7 @@ router.post("/register", async (req, res) => {
   }
 
   // Add password validation (minimum 8 characters, at least one letter and one number)
-  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
   if (!passwordRegex.test(password)) {
     return res.status(400).json({
       error: "Password must be at least 8 characters long and include at least one letter and one number",
