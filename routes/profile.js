@@ -1,13 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../models/user");
-const authenticateJWT = require("../middleware/authenticateJWT");
+const authenticateJWT = require("../middleware/authenticateJWT"); // Import JWT middleware
 
-// Middleware to authenticate user requests
-router.use(authenticateJWT);
+// Apply authenticateJWT middleware to specific routes
 
-// GET route to fetch user profile by username
-router.get("/user/:username", async (req, res, next) => {
+// GET route to fetch user profile by username, with authentication
+router.get("/user/:username", authenticateJWT, async (req, res, next) => {
   try {
     const username = req.params.username;
     if (req.user.username !== username) {

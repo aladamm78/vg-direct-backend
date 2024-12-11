@@ -5,17 +5,18 @@ const commentModel = require('../models/commentModel');
 
 // Route to post a comment on a forum post
 router.post('/comments', authenticateJWT, async (req, res, next) => {
+  console.log("POST /comments route hit");
+  console.log("Request body:", req.body);
   try {
     const { post_id, content } = req.body;
     const user_id = req.user.user_id;
 
-    // Validate input
     if (!post_id || !content) {
       return res.status(400).json({ error: 'post_id and content are required.' });
     }
 
-    // Create a new comment
     const newComment = await commentModel.createComment(post_id, user_id, content);
+    console.log("New comment created:", newComment);
 
     return res.status(201).json(newComment);
   } catch (err) {
@@ -23,6 +24,7 @@ router.post('/comments', authenticateJWT, async (req, res, next) => {
     next(err);
   }
 });
+
 
 // Route to post a reply to a specific comment
 router.post('/comments/reply', authenticateJWT, async (req, res, next) => {

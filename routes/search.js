@@ -1,38 +1,36 @@
-require("dotenv").config();
-
 const express = require("express");
 const fetch = require("node-fetch");
+
 const router = express.Router();
 
-// Use the key from the .env file or a fallback
-const API_KEY = process.env.RAWG_API_KEY || "9aa05b2ff77b476c8ff49505059dd4ed";
-
-// GET /api/search
 router.get("/", async (req, res) => {
-  const { query } = req.query;
-
-  if (!query) {
-    return res.status(400).json({ error: "Query parameter is required" });
-  }
-
   try {
-    const rawgResponse = await fetch(
-      `https://api.rawg.io/api/games?key=${API_KEY}&search=${query}`
-    );
+    const { query } = req.query;
 
-    const rawgText = await rawgResponse.text(); // Log the full RAWG API response
-    console.log("RAWG API Response:", rawgText);
-
-    const rawgData = JSON.parse(rawgText);
-
-    if (!rawgData.results || rawgData.results.length === 0) {
-      return res.status(404).json({ error: "No results found" });
+    if (!query) {
+      return res.status(400).json({ error: "Query parameter is required" });
     }
 
-    res.status(200).json(rawgData.results);
-  } catch (error) {
-    console.error("Error fetching RAWG API data:", error);
-    res.status(500).json({ error: "Failed to fetch data from RAWG API" });
+    console.log("Query parameter:", query);
+
+    const apiUrl = `https://api.rawg.io/api/games?key=${process.env.RAWG_API_KEY}&search=${query}`;
+    console.log("API URL:", apiUrl);
+
+    const response = await fetch(apiUrl);
+    console.log("RAWG API Response:", response);
+
+    if (!response.ok) {
+      console.error("RAWG API returned an error:", response.statusText || "Unknown error");
+      return res.status(response.status || 500).json({ error: "Failed to fetch from RAWG API" });
+    }
+
+    const data = await response.json();
+    console.log("RAWG API Data:", data);
+
+    res.status(200).json(data.results);
+  } catch (err) {
+    console.error("Error in search route:", err);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 

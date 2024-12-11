@@ -1,7 +1,7 @@
 const axios = require("axios");
 const pool = require("../db"); // Import the PostgreSQL connection
 
-const API_KEY = "9aa05b2ff77b476c8ff49505059dd4ed";
+const API_KEY = "process.env.REACT_APP_RAWG_API_KEY";
 
 const fetchAndMapGames = async () => {
   try {

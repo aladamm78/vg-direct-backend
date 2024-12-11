@@ -16,6 +16,14 @@ router.post("/register", async (req, res) => {
     return res.status(400).json({ error: "All fields are required" });
   }
 
+  // Add password validation (minimum 8 characters, at least one letter and one number)
+  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+  if (!passwordRegex.test(password)) {
+    return res.status(400).json({
+      error: "Password must be at least 8 characters long and include at least one letter and one number",
+    });
+  }
+
   try {
     // Check if email or username already exists
     const userExists = await pool.query(
@@ -39,7 +47,7 @@ router.post("/register", async (req, res) => {
     // Generate JWT token
     const token = jwt.sign(
       { user_id: newUser.rows[0].user_id, username: newUser.rows[0].username },
-      SECRET_KEY, // Use the same secret key as in the `.env`
+      SECRET_KEY,
       { expiresIn: "1h" }
     );
 
@@ -49,6 +57,7 @@ router.post("/register", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+
 
 
 // Login a user

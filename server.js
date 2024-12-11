@@ -13,6 +13,7 @@ const userRoutes = require('./routes/user');
 const commentsRoutes = require('./routes/comments');
 const reviewsRoutes = require('./routes/reviews');
 const searchRoutes = require("./routes/search");
+const reviewRouter = require('./routes/reviews');
 
 const app = express();
 
@@ -26,7 +27,7 @@ app.listen(PORT, () => {
 }
 
 const BASE_URL = "https://api.rawg.io/api";
-const API_KEY = "9aa05b2ff77b476c8ff49505059dd4ed";
+const API_KEY = process.env.API_KEY;
 
 // Middleware
 app.use(cors());
@@ -42,6 +43,7 @@ app.use('/api/users', userRoutes);
 app.use('/api', commentsRoutes);
 app.use('/api', reviewsRoutes);
 app.use("/api/search", searchRoutes);
+app.use('/api', reviewRouter);
 
 // RAWG API routes
 app.get("/api/games", async (req, res) => {
